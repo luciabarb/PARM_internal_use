@@ -10,6 +10,7 @@
   - [Training your own PARM model](#training-your-own-parm-model)
   - [Evaluating your model with the test fold](#evaluating-your-model-with-the-test-fold)
   - [Considerations for training your model](#considerations-for-training-your-model)
+- [Citation](#citation)
 
 ## Introduction
 
@@ -205,3 +206,11 @@ This will create `my_AGS_model_test` directory containing the scatter plots show
 - The provided data in the `example_data/training_data` is not enough to train a good PARM model. We provide it here solely for this tutorial.
 - Always run the `PARM train` function from a GPU server. A normal CPU machine will take a long time to train a model, even with the provided example data. At the start of the training, PARM will print on the screen if a GPU is detected. Make sure that you see `GPU detected? True`. You can also run `parm train --check_cuda`; this will check if any GPU is detected and exit.
 - Even if your input data contains measurements for more than one cell (as the provided example, which contains data for AGS and HAP1), you can only train a model for one cell at a time.
+
+---
+
+## Citation
+
+If you make use of PARM and/or this pipeline, please cite:
+
+> [Barbadilla-Martínez, L.; Klaassen, N.; Franceschini-Santos, V. H.; Breda, J.; Hernandez-Quiles, M.; van Lieshout, T.; Urzua Traslaviña, C.; Yücel, H.; Boi, M.; Hermana-Garcia-Agullo, C.; Gregoricchio, S.; Zwart, W.; Voest, E.; Franke, L.; Vermeulen, M.; de Ridder, J., van Steensel, B. (2024). The regulatory grammar of human promoters uncovered by MPRA-trained deep learning. BioRxiv.](https://www.biorxiv.org/content/10.1101/2024.07.09.602649v2)
