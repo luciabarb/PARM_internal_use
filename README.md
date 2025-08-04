@@ -99,7 +99,7 @@ This can be changed using optional arguments.
 
 Run `parm plot --help` for additional help on that.
 
-### Training your own PARM model
+## Training your own PARM model
 
 If you want to train a PARM model with your MPRA data, you must pre-process the raw MPRA counts using our [pre-processing pipeline](https://github.com/vansteensellab/PARM_preprocessing_pipeline).
 This will produce, mainly, one-hot encoded files with the promoter activity per fragment, per cell. 
