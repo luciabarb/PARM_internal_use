@@ -27,7 +27,15 @@ This is useful for predicting which TFs are regulating (activating or repressing
 **PARM** can be easily installed with `conda`:
 
 ```sh
-conda install -c anaconda -c conda-forge -c bioconda -c pytorch parm
+conda install -n parm-env -c conda-forge -c bioconda -c pytorch parm
+```
+
+Note: this package can benefit from GPU acceleration using CUDA. Ensure that the [virtual package](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-virtual.html) `__cuda` is present using `conda info` or use `CONDA_OVERRIDE_CUDA=<version>` to specify CUDA version.
+
+To use the package, activate the environment using:
+
+```sh
+conda activate parm-env
 ```
 
 ## Usage examples
