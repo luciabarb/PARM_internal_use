@@ -174,13 +174,7 @@ def get_test_fold_predictions(
         # Load measured values
         measured = f["Y"][f"Log2RPM_{cell_type}"][:]
         # Load the feature names of each fragment
-        # temporary: create a vector that pastes the FEATstart and FEATend fields
-        feature_names = np.char.add(
-            np.char.add(f["FEAT"]["FEATstart"][:].astype(str), "_"),
-            np.char.add(f["FEAT"]["FEATstart"][:].astype(str), "_"),
-        )
-        feature_names = np.char.add(feature_names, f["FEAT"]["FEATend"][:].astype(str))
-        # feature_names = f['FEAT']
+        feature_names = f["FEAT"]["FEATname"][:].astype(str)
 
     log(f"Loaded {len(sequences)} test fragments")
 

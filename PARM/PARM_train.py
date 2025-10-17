@@ -86,7 +86,6 @@ def PARM_train(args):
         "n_block": args.n_blocks,
         "cell_type": args.cell_type,
         "n_workers": args.n_workers,
-        "measurement_column": args.measurement_column,
     }
 
     objective(**param_model)
@@ -106,7 +105,6 @@ def objective(
     filter_size,
     cell_type,
     scheduler,
-    measurement_column,
     adaptor=(False, False),
     n_workers=0,
 ):
@@ -124,7 +122,6 @@ def objective(
         adaptor: (tuple) Tuple with adaptor in 5' and adaptor in 3' in this order. If not false they are going to be used for padding.
         weight_decay: (float) Weight decay of loss
         validation_path: (str) Path to validation file hdf5.
-        measurement_column: (str) Column name in hdf5 file with the measurement.
 
     Returns:
 
@@ -185,7 +182,7 @@ def objective(
     index_dataset_train = np.empty((2, 0), dtype=int)
     for i, directory in enumerate(input_directory):
         training_set = h5_dataset(
-            path=directory, celltype=cell_type, measurement_column=measurement_column
+            path=directory, celltype=cell_type
         )
 
         index_train_ind = np.arange(len(training_set))
@@ -197,7 +194,7 @@ def objective(
         )
 
     index_dataset_train = np.transpose(index_dataset_train)
-    training_set = h5_dataset(path=input_directory, celltype=cell_type, measurement_column=measurement_column)
+    training_set = h5_dataset(path=input_directory, celltype=cell_type)
     log(f"Number of fragments shorter than {L_max}: {index_dataset_train.shape[0]}")
 
     sampler = shuffle_batch_sampler(
@@ -212,7 +209,7 @@ def objective(
     ##feat_selection_percentage
     index_dataset_valid = np.empty((2, 0), dtype=int)
     for i, directory in enumerate(validation_path):
-        validation_set = h5_dataset(path=validation_path, celltype=cell_type, measurement_column=measurement_column)
+        validation_set = h5_dataset(path=validation_path, celltype=cell_type)
 
         index_valid_ind = np.arange(len(validation_set))
 
@@ -225,7 +222,7 @@ def objective(
 
     # This take into account different type of inputs. In case the folds are defined directly written as valid.
 
-    validation_set = h5_dataset(path=validation_path, celltype=cell_type, measurement_column=measurement_column)
+    validation_set = h5_dataset(path=validation_path, celltype=cell_type)
 
     sampler = shuffle_batch_sampler(
         index_dataset_valid, batch_size=batch_size, drop_last=False
