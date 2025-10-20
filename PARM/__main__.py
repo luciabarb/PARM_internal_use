@@ -2,14 +2,9 @@
 
 import argparse
 from .rrwick_help_formatter import MyParser, MyHelpFormatter
-from .PARM_predict import PARM_predict
-from .PARM_mutagenesis import PARM_mutagenesis, PARM_plot_mutagenesis
-from .PARM_train import PARM_train
 from .version import __version__
-from .PARM_misc import check_sequence_length, check_cuda
 import warnings
-import os
-import sys
+from .PARM_misc import check_cuda
 
 warnings.filterwarnings("ignore")
 
@@ -87,6 +82,8 @@ def print_arguments(left, right, total_width=80):
 
 
 def train(args):
+    # Lazy import to reduce initial loading time
+    from .PARM_train import PARM_train
     # Implement the logic for the train command here
     print(description)
     print("=" * 80)
@@ -113,6 +110,8 @@ def train(args):
 
 
 def predict(args):
+    # Lazy import to reduce initial loading time
+    from .PARM_predict import PARM_predict
     # Implement the logic for the predict command here
     print(description)
     print("=" * 80)
@@ -143,6 +142,9 @@ def predict(args):
 
 
 def mutagenesis(args):
+    # Lazy import to reduce initial loading time
+    from .PARM_mutagenesis import PARM_mutagenesis
+    from .PARM_misc import check_sequence_length
     # Check input fasta
     check_sequence_length(args.input, args.L_max)
     print(description)
@@ -170,6 +172,8 @@ def mutagenesis(args):
 
 
 def plot(args):
+    # Lazy import to reduce initial loading time
+    from .PARM_mutagenesis import PARM_plot_mutagenesis
     print(description)
     print("=" * 80)
     print("{: ^80}".format("Plot"))
@@ -341,6 +345,13 @@ def train_subparser(subparsers):
         default=125,
         type=int,
         help="Number of filters in convolution layers (default: 125)",
+    )
+    
+    model_args.add_argument(
+        "--initial_weights",
+        default=None,
+        type=str,
+        help="Path to initial weights file. If None, random initialization is used. (default: None)",
     )
 
     other_args = group.add_argument_group("Other")

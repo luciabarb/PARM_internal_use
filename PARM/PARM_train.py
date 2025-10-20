@@ -43,6 +43,7 @@ def PARM_train(args):
         sys.exit(
             f"Error: Wrong values of betas. You must provide two values, you provided {len(betas)}"
         )
+    initial_weights = args.initial_weights
     #############
     # 3. Create output directory
 
@@ -86,6 +87,7 @@ def PARM_train(args):
         "n_block": args.n_blocks,
         "cell_type": args.cell_type,
         "n_workers": args.n_workers,
+        "initial_weights": initial_weights,
     }
 
     objective(**param_model)
@@ -107,6 +109,7 @@ def objective(
     scheduler,
     adaptor=(False, False),
     n_workers=0,
+    initial_weights=None,
 ):
     """
     Objetive function to train and validate models.
@@ -122,6 +125,11 @@ def objective(
         adaptor: (tuple) Tuple with adaptor in 5' and adaptor in 3' in this order. If not false they are going to be used for padding.
         weight_decay: (float) Weight decay of loss
         validation_path: (str) Path to validation file hdf5.
+        n_block: (int) Number of blocks in the model.
+        filter_size: (int) Filter size in the model.
+        cell_type: (str) Cell type to train the model.
+        n_workers: (int) Number of workers to use in data loading.
+        initial_weights: (str) Path to initial weights file. If None, random initialization is used.
 
     Returns:
 
@@ -141,7 +149,22 @@ def objective(
     ###Load model
 
     # cell_type_strip_replicates = celltype.replace('pNK7_','').replace('_B','')
-    model = load_PARM(L_max=L_max, n_block=n_block, filter_size=filter_size, train=True)
+    if initial_weights is None:
+        log("Initializing model with random weights")
+        model = load_PARM(
+            L_max=L_max,
+            n_block=n_block,
+            filter_size=filter_size,
+            train=True,
+        )
+    else:
+        log(f"Initializing model using weights in {initial_weights}")
+        model = load_PARM(
+            weight_file=initial_weights,
+            L_max=L_max,
+            n_block=n_block,
+            filter_size=filter_size,
+        )
     dummybatch = torch.zeros(1, 4, L_max)
 
     if torch.cuda.is_available():

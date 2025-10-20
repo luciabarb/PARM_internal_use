@@ -1,20 +1,20 @@
-import torch
-import numpy as np
-from Bio import SeqIO
-from Bio import motifs
-import pandas as pd
-import os
-import io
-import urllib
-from .PARM_utils_load_model import load_PARM
+# import torch
+# import numpy as np
+# from Bio import SeqIO
+# from Bio import motifs
+# import pandas as pd
+# import os
+# import io
+# import urllib
+# from .PARM_utils_load_model import load_PARM
 from .PARM_misc import log
-from tqdm import tqdm
-from matplotlib import pyplot as plt, colors
-import matplotlib
-import logomaker
-import seaborn as sns
-from pathlib import Path
-import sys
+# from tqdm import tqdm
+# from matplotlib import pyplot as plt, colors
+# import matplotlib
+# import logomaker
+# import seaborn as sns
+# from pathlib import Path
+# import sys
 
 
 def PARM_mutagenesis(
@@ -52,6 +52,13 @@ def PARM_mutagenesis(
     >>> PARM_mutagenesis("input.fasta", ["model1.parm", "model2.parm"], "motif_database.txt", "output")
 
     """
+    # Lazy imports
+    from Bio import SeqIO
+    import os
+    from .PARM_utils_load_model import load_PARM
+    from tqdm import tqdm
+    from .PARM_mutagenesis_utils import create_dataframe_mutation_effect
+    # ====================================================================================
     parm_scores = dict()
     # Loading motif database
     log("Loading motif database")
@@ -138,6 +145,11 @@ def dict_jaspar(
     --------
     >>> PFM_hocomoco_dict, consensus_hocomoco_dict, ICT_hocomoco_dict = dict_jaspar("motif_database.txt", reverse=True)
     """
+    # Lazy imports
+    from Bio import motifs
+    import numpy as np
+    import io
+    import urllib.request
 
     if "https" in file:
         handle = urllib.request.urlopen(file)
@@ -191,7 +203,7 @@ def dict_jaspar(
     return (PFM_hocomoco_dict, consensus_hocomoco_dict, ICT_hocomoco_dict)
 
 
-def predict_fragments(seq: str, L_max: int, completemodel: torch.nn.Module):
+def predict_fragments(seq: str, L_max: int, completemodel):
     """
     Predicts the promoter activity score for input fragment
     Converts the sequence to one hot and then predicts the score.
@@ -215,6 +227,10 @@ def predict_fragments(seq: str, L_max: int, completemodel: torch.nn.Module):
     >>> predict_fragments("ATCG", 600, model)
 
     """
+    # Lazy imports
+    import torch
+    import numpy as np
+    
     if torch.cuda.is_available():
         completemodel = completemodel.cuda()
 
@@ -255,6 +271,10 @@ def get_one_hot(
     --------
     >>> get_one_hot(["ATCG"], 600)
     """
+    # Lazy imports
+    import numpy as np
+    import sys
+    
     # Define nucleotide to vector
     letter2vector = {
         "A": np.array([1.0, 0.0, 0.0, 0.0]),
@@ -353,7 +373,11 @@ def motif_attribution(
     >>> seq = "AGCTAGCTAGCTAGCTTAGC"
     >>> motif_attribution(seq, 600, 0, 4, model)
     """
-
+    # Lazy imports
+    import torch
+    import numpy as np
+    import sys
+    
     # If seq is a list, we have multiple sequences or index ouputs
     if type(seq) != list:
         seq = [seq]
@@ -468,7 +492,7 @@ def motif_attribution(
             att_per_index
         ):  # Loop if there's more than one index output
             att_seq = []
-            for it_seq in range(len(seq)):  # Loop through sequence
+            for it_seq in ran3333ge(len(seq)):  # Loop through sequence
                 attribution_seq = attribution[it_seq, :, :]
 
                 if window_del is not False:
@@ -537,7 +561,9 @@ def peaks_scanning(
     >>> peaks_scanning(attribution, 5, 4, True)
 
     """
-
+    # Lazy imports
+    import numpy as np
+    
     if append:
         zeros_padding = np.zeros(shape=(4, 5))
         attribution = np.concatenate(
@@ -789,6 +815,9 @@ def compute_correlation_between_motifs(
     --------
     >>> compute_correlation_between_motifs(pfm, motif_attribution, ICM, True)
     """
+    # Lazy imports
+    import numpy as np
+    
     ## Compute the correlation score between known PPM and the one of the attribution scores
 
     ## 1. Positive attributions (activators)
@@ -910,7 +939,11 @@ def run_motif_scanning(
     >>> run_motif_scanning(known_PFM, attribution_seq, 0.6, False, True, False, False, 0.001)
 
     """
-
+    # Lazy imports
+    import numpy as np
+    import sys
+    import pandas as pd
+    
     if append:
         zeros_padding = np.zeros(shape=(4, 5))
         attribution_seq = np.concatenate(
@@ -1171,7 +1204,11 @@ def slide_through_attribution_and_PFM_fast(
     --------
     >>> slide_through_attribution_and_PFM_fast(known_PFM, attribution_seq, True, 0.001)
     """
-
+    import time
+    import numpy as np
+    import torch
+    import pandas as pd
+    
     if append:
         zeros_padding = np.zeros(shape=(4, 5))
         attribution_seq = np.concatenate(
@@ -1272,7 +1309,12 @@ def conv_with_PFM_slide_through_attribution(
     --------
     >>> conv_with_PFM_slide_through_attribution(known_PFM, attribution_seq, False, False, False)
     """
-
+    import time
+    import numpy as np
+    import torch
+    import sys
+    import pandas as pd
+    
     length_sequence = attribution_seq.shape[-1]
 
     ## 1. Positive attributions (activators)
@@ -1469,6 +1511,14 @@ def PARM_plot_mutagenesis(
     --------
     >>> PARM_plot_mutagenesis(input, 0.5, 0.5, "png", output_directory, [0, 1])
     """
+    import os
+    import sys
+    from pathlib import Path
+    import pandas as pd
+    from tqdm import tqdm
+    from PARM.plotting.plot_mutagenesis import plot_mutagenesis
+    from PARM.utils.logging import log
+    
     log("Reading input directory")
     input_directory = Path(input)
     # Quit if input directory does not exist
@@ -1562,7 +1612,11 @@ def plot_logo(
     --------
     >>> plot_logo(matrix, ax_name, "ylabel", False, False, "medium", False, False)
     """
-
+    import logomaker
+    import pandas as pd
+    import numpy as np
+    from matplotlib import colors
+    
     tf_mut_score_plot = pd.DataFrame(np.transpose(matrix), columns=["A", "C", "G", "T"])
 
     if colors_base:
@@ -1627,7 +1681,12 @@ def find_hits_and_make_logo(
         split_pos_neg: (bool) If True, split the attribution between negative and positive values when searching for hits.
 
     """
-
+    import numpy as np
+    import pandas as pd
+    from matplotlib import pyplot as plt, colors
+    from PARM.motif_scanning.motif_scanning import run_motif_scanning
+    import logomaker
+    
     len_seq = matrix.shape[1]
     # Find hits, creates dataframe
 
@@ -1841,7 +1900,12 @@ def create_dataframe_mutation_effect(
             type_motif_scanning: (str) Either 'PCC' or 'conv_scanning'
             
     """
-
+    import os
+    import sys
+    import numpy as np
+    import pandas as pd
+    
+    
     if type_motif_scanning != "PCC" and type_motif_scanning != "conv_scanning":
         sys.exit(
             f'Error: Type of motif scanning should be either "PCC" or "conv_scanning", but you selected {type_motif_scanning}'
@@ -2037,7 +2101,12 @@ def plot_mutagenesis(
         cutoff: (float) PCC cutoff to do motif scanning similarity (default 0.3).
 
     """
-
+    # Lazy imports
+    import numpy as np
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    
     ##IF not provided, just load  them
     if PFM_hocomoco_dict is False or ICT_hocomoco_dict is False:
         PFM_hocomoco_dict, _, ICT_hocomoco_dict = dict_jaspar(reverse=True)
