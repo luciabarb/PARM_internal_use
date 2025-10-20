@@ -104,6 +104,7 @@ def train(args):
     print_arguments("L_max", args.L_max)
     print_arguments("Number of blocks", args.n_blocks)
     print_arguments("Filter size", args.filter_size)
+    print_arguments("Initial weights", args.initial_weights)
 
     print("=" * 80)
     PARM_train(args)
