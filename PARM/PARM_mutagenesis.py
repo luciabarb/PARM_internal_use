@@ -492,7 +492,7 @@ def motif_attribution(
             att_per_index
         ):  # Loop if there's more than one index output
             att_seq = []
-            for it_seq in ran3333ge(len(seq)):  # Loop through sequence
+            for it_seq in range(len(seq)):  # Loop through sequence
                 attribution_seq = attribution[it_seq, :, :]
 
                 if window_del is not False:
