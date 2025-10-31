@@ -8,15 +8,16 @@
 - [Running _in-silico_ mutagenesis](#running-in-silico-mutagenesis)
 - [Plotting results of _in-silico_ mutagenesis](#plotting-results-of-in-silico-mutagenesis)
   - [Training your own PARM model](#training-your-own-parm-model)
-  - [Making predictions with your own model](#making-predictions-with-your-own-model)
-    - [Considerations for training your model](#considerations-for-training-your-model)
+  - [Evaluating your model with the test fold](#evaluating-your-model-with-the-test-fold)
+  - [Considerations for training your model](#considerations-for-training-your-model)
+- [Citation](#citation)
 
 ## Introduction
 
-PARM (Promoter Activity Regulatory Model) is a deep learning model that predicts the promoter activity from the DNA sequence itself.
-As a convolution neural network trained on MPRA data, **PARM** is very lightweight and produces predictions in a cell-type-specific manner.
+PARM (Promoter Activity Regulatory Model) is a deep learning model that predicts promoter activity from the DNA sequence itself.
+As a convolutional neural network trained on MPRA data, **PARM** is very lightweight and produces predictions in a cell-type-specific manner.
 
-With the `PARM predict` tool, you can get predictions for any sequence that you want for K562, HepG2, MCF7, LNCaP, or HCT116 cells. 
+With the `PARM predict` tool, you can get predictions for any sequence that you want for AGS, HAP1, HCT116, HEK116, HepG2, K562, LNCaP, MCF7, and U2OS cells.
 
 With `PARM mutagenesis`, in addition to simple promoter activity scores, **PARM** can also produce the so-called _in-silico_ mutagenesis plot.
 This is useful for predicting which TFs are regulating (activating or repressing) your sequence. (read more on [Running _in-silico_ mutagenesis](#running-in-silico-mutagenesis)).
@@ -26,7 +27,12 @@ This is useful for predicting which TFs are regulating (activating or repressing
 **PARM** can be easily installed with `conda`:
 
 ```sh
-conda install -c anaconda -c conda-forge -c bioconda -c pytorch parm
+conda create -n parm_env -c conda-forge -c bioconda -c pytorch parm
+```
+This will create an environment with **PARM** and all dependencies. Before running, activate the environment with:
+
+```sh
+conda activate parm_env
 ```
 
 ## Usage examples
@@ -79,13 +85,13 @@ The output of `PARM mutagenesis` is a directory where, for every sequence, both 
 
 ## Plotting results of _in-silico_ mutagenesis
 
-Results of _in-silico_ mutagenesis are more insightful when visualized in the following format:
+Results of _in-silico_ mutagenesis are more insightful when visualised in the following format:
 
 <p align="center"><img src="misc/CXCR4_chr2:136875708:136875939:-.png" alt="plot example" width="100%"></p>
 
 You can easily see the mutagenesis matrix and all the scanned TF motifs.
 
-To produce such a visualization, you can run:
+To produce such a visualisation, you can run:
 
 ```sh
 parm plot \
@@ -93,12 +99,12 @@ parm plot \
 ```
 
 This will read the mutagenesis matrix and the hits for the sequence `sequence_of_interest` and generate the plot.
-By default, **PARM** stored the result plot as a PDF inside the input dir.
+By default, **PARM** stores the result plot as a PDF inside the input dir.
 This can be changed using optional arguments. 
 
 Run `parm plot --help` for additional help on that.
 
-### Training your own PARM model
+## Training your own PARM model
 
 If you want to train a PARM model with your MPRA data, you must pre-process the raw MPRA counts using our [pre-processing pipeline](https://github.com/vansteensellab/PARM_preprocessing_pipeline).
 This will produce, mainly, one-hot encoded files with the promoter activity per fragment, per cell. 
@@ -110,8 +116,8 @@ To train the PARM models for the AGS cell, you can run:
 ```sh
 # Fold 0 model
 parm train \
-  --input example_data/training_data/onehot/fold[1234].* \
-  --validation example_data/training_data/onehot/fold0.hdf5 \
+  --input example_data/training_data/fold[1234].* \
+  --validation example_data/training_data/fold0.hdf5 \
   --output AGS_fold0 \
   --cell_type AGS
 ```
@@ -144,34 +150,32 @@ Similarly, for the other folds, you can run:
 ```sh
 # Fold 1 model
 parm train \
-  --input example_data/training_data/onehot/fold[0234].* \
-  --validation example_data/training_data/onehot/fold1.hdf5 \
+  --input example_data/training_data/fold[0234].* \
+  --validation example_data/training_data/fold1.hdf5 \
   --output AGS_fold1 \
   --cell_type AGS
 
 # Fold 2 model
 parm train \
-  --input example_data/training_data/onehot/fold[0134].* \
-  --validation example_data/training_data/onehot/fold2.hdf5 \
+  --input example_data/training_data/fold[0134].* \
+  --validation example_data/training_data/fold2.hdf5 \
   --output AGS_fold2 \
   --cell_type AGS
 
 # Fold 3 model
 parm train \
-  --input example_data/training_data/onehot/fold[0124].* \
-  --validation example_data/training_data/onehot/fold3.hdf5 \
+  --input example_data/training_data/fold[0124].* \
+  --validation example_data/training_data/fold3.hdf5 \
   --output AGS_fold3 \
   --cell_type AGS
 
 # Fold 4 model
 parm train \
-  --input example_data/training_data/onehot/fold[0123].* \
-  --validation example_data/training_data/onehot/fold4.hdf5 \
+  --input example_data/training_data/fold[0123].* \
+  --validation example_data/training_data/fold4.hdf5 \
   --output AGS_fold4 \
   --cell_type AGS
 ```
-
-### Making predictions with your own model
 
 After training all the folds, you should place all the folds in a single directory:
 
@@ -185,17 +189,33 @@ cp AGS_fold0/AGS_fold0.parm \
    my_AGS_model/
 ```
 
-and then, run:
+### Evaluating your model with the test fold
+
+Now, you can evaluate the model using the test fold. This is part of your dataset that was excluded from the training. 
+Therefore, a standard evaluation of the model is to compare the measured and predicted promoter activity of the fragments in this fold.
+
+For this, you can make use of the `--predict_test_fold` flag of the `PARM predict`, as follows:
 
 ```sh
 parm predict \
-  --input example_data/input.fasta \
-  --output output_my_AGS.txt \
+  --predict_test_fold \
+  --input example_data/training_data/test.hdf5 \
+  --output my_AGS_model_test \
   --model my_AGS_model/
 ```
 
+This will create `my_AGS_model_test` directory containing the scatter plots showing the correlation between measured and predicted activity, both at the fragment and feature levels (averaging fragments of the same regulatory features). 
+
 #### Considerations for training your model
 
-- The provided data in the `example_data/training_data` is not enough to train a good PARM model. We only provide it here for the sake of this tutorial.
-- Always run the `PARM train` function from a GPU server. A normal CPU machine will take a long time to train a model, even the provided example data. In the start of the training, PARM will print in the screen if a GPU is detected. Make sure that you see `GPU detected? True`.
-- Even if your input data contains measurements for more than one cell (as the provided example, that contains data for AGS and HAP1), you can only train a model for one cell at a time.
+- The provided data in the `example_data/training_data` is not enough to train a good PARM model. We provide it here solely for this tutorial.
+- Always run the `PARM train` function from a GPU server. A normal CPU machine will take a long time to train a model, even with the provided example data. At the start of the training, PARM will print on the screen if a GPU is detected. Make sure that you see `GPU detected? True`. You can also run `parm train --check_cuda`; this will check if any GPU is detected and exit.
+- Even if your input data contains measurements for more than one cell (as the provided example, which contains data for AGS and HAP1), you can only train a model for one cell at a time.
+
+---
+
+## Citation
+
+If you make use of PARM and/or this pipeline, please cite:
+
+> [Barbadilla-Martínez, L.; Klaassen, N.; Franceschini-Santos, V. H.; Breda, J.; Hernandez-Quiles, M.; van Lieshout, T.; Urzua Traslaviña, C.; Yücel, H.; Boi, M.; Hermana-Garcia-Agullo, C.; Gregoricchio, S.; Zwart, W.; Voest, E.; Franke, L.; Vermeulen, M.; de Ridder, J., van Steensel, B. (2024). The regulatory grammar of human promoters uncovered by MPRA-trained deep learning. BioRxiv.](https://www.biorxiv.org/content/10.1101/2024.07.09.602649v2)
