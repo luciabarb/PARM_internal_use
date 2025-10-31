@@ -2,14 +2,9 @@
 
 import argparse
 from .rrwick_help_formatter import MyParser, MyHelpFormatter
-from .PARM_predict import PARM_predict
-from .PARM_mutagenesis import PARM_mutagenesis, PARM_plot_mutagenesis
-from .PARM_train import PARM_train
 from .version import __version__
-from .PARM_misc import check_sequence_length, check_cuda
 import warnings
-import os
-import sys
+from .PARM_misc import check_cuda
 
 warnings.filterwarnings("ignore")
 
@@ -87,6 +82,8 @@ def print_arguments(left, right, total_width=80):
 
 
 def train(args):
+    # Lazy import to reduce initial loading time
+    from .PARM_train import PARM_train
     # Implement the logic for the train command here
     print(description)
     print("=" * 80)
@@ -96,7 +93,6 @@ def train(args):
     print_arguments("Validation", args.validation)
     print_arguments("Output", args.output)
     print_arguments("Cell type", args.cell_type)
-    print_arguments("Measurement column name", args.measurement_column)
     print_arguments("Number of workers", args.n_workers)
     print_arguments("Number of epochs", args.n_epochs)
     print_arguments("Batch size", args.batch_size)
@@ -108,12 +104,15 @@ def train(args):
     print_arguments("L_max", args.L_max)
     print_arguments("Number of blocks", args.n_blocks)
     print_arguments("Filter size", args.filter_size)
+    print_arguments("Initial weights", args.initial_weights)
 
     print("=" * 80)
     PARM_train(args)
 
 
 def predict(args):
+    # Lazy import to reduce initial loading time
+    from .PARM_predict import PARM_predict
     # Implement the logic for the predict command here
     print(description)
     print("=" * 80)
@@ -144,6 +143,9 @@ def predict(args):
 
 
 def mutagenesis(args):
+    # Lazy import to reduce initial loading time
+    from .PARM_mutagenesis import PARM_mutagenesis
+    from .PARM_misc import check_sequence_length
     # Check input fasta
     check_sequence_length(args.input, args.L_max)
     print(description)
@@ -171,6 +173,8 @@ def mutagenesis(args):
 
 
 def plot(args):
+    # Lazy import to reduce initial loading time
+    from .PARM_mutagenesis import PARM_plot_mutagenesis
     print(description)
     print("=" * 80)
     print("{: ^80}".format("Plot"))
@@ -253,13 +257,6 @@ def train_subparser(subparsers):
         type=str,
         help="The name of the cell type that you want to create a model to. "
         "This should be the same name as in the input h5 files",
-    )
-    
-    required_args.add_argument(
-        "--measurement_column", required=True,
-        type=str,
-        help="Which column in the input file contains the measurement data. "
-        "(e.g., Log2TPM_K562)",
     )
 
     model_args = group.add_argument_group("Advanced arguments (for model training)")
@@ -349,6 +346,13 @@ def train_subparser(subparsers):
         default=125,
         type=int,
         help="Number of filters in convolution layers (default: 125)",
+    )
+    
+    model_args.add_argument(
+        "--initial_weights",
+        default=None,
+        type=str,
+        help="Path to initial weights file. If None, random initialization is used. (default: None)",
     )
 
     other_args = group.add_argument_group("Other")
