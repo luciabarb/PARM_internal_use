@@ -57,7 +57,6 @@ def PARM_mutagenesis(
     import os
     from .PARM_utils_load_model import load_PARM
     from tqdm import tqdm
-    from .PARM_mutagenesis_utils import create_dataframe_mutation_effect
     # ====================================================================================
     parm_scores = dict()
     # Loading motif database
@@ -320,7 +319,7 @@ def motif_attribution(
     L_max: int,
     start_motif: int,
     end_motif: int,
-    completemodel: torch.nn.Module,
+    completemodel,
     ref_to_alt_attribution: bool = False,
     return_reference_score: bool = False,
     index_output: int = 0,
@@ -527,7 +526,7 @@ def motif_attribution(
 
 
 def peaks_scanning(
-    attribution: np.array,
+    attribution,
     length_peaks: int = 5,
     number_vocab: int = 4,
     append: bool = True,
@@ -727,7 +726,7 @@ def compute_attribution(
     L_max: int,
     start_motif: int,
     end_motif: int,
-    completemodel: torch.nn.Module,
+    completemodel,
     index_output: int = 0,
     alt_nt: list = ["A", "C", "G", "T"],
     window_del: bool = False,
@@ -786,9 +785,9 @@ def compute_attribution(
 
 
 def compute_correlation_between_motifs(
-    pfm: np.array,
-    motif_attribution: np.array,
-    ICM: np.array = False,
+    pfm,
+    motif_attribution,
+    ICM = False,
     return_PFM: bool = False,
 ):
     """
@@ -897,7 +896,7 @@ def compute_correlation_between_motifs(
 
 def run_motif_scanning(
     known_PFM: dict,
-    attribution_seq: np.array,
+    attribution_seq,
     threshold: float = 0.6,
     attribution: bool = False,
     append: bool = True,
@@ -1177,7 +1176,7 @@ def run_motif_scanning(
 
 def slide_through_attribution_and_PFM_fast(
     known_PFM: dict,
-    attribution_seq: np.array,
+    attribution_seq,
     append: bool = True,
     cutoff_att: float = 0.001,
 ):
@@ -1279,8 +1278,8 @@ def slide_through_attribution_and_PFM_fast(
 
 def conv_with_PFM_slide_through_attribution(
     known_PFM: dict,
-    attribution_seq: np.array,
-    multiple_one_hot: np.array = False,
+    attribution_seq,
+    multiple_one_hot = False,
     normalize: bool = False,
     sequence: bool = False,
 ):
@@ -1481,11 +1480,11 @@ def conv_with_PFM_slide_through_attribution(
 # Plotting =====================================================================
 # ==============================================================================
 def PARM_plot_mutagenesis(
-    input: os.path,
+    input,
     correlation_threshold: float,
     attribution_threshold: float,
     plot_format: str,
-    output_directory: os.path = None,
+    output_directory = None,
     attribution_range: list = None,
 ):
     """
@@ -1516,8 +1515,7 @@ def PARM_plot_mutagenesis(
     from pathlib import Path
     import pandas as pd
     from tqdm import tqdm
-    from PARM.plotting.plot_mutagenesis import plot_mutagenesis
-    from PARM.utils.logging import log
+    from .PARM_misc import log
     
     log("Reading input directory")
     input_directory = Path(input)
@@ -1578,8 +1576,8 @@ def PARM_plot_mutagenesis(
 
 
 def plot_logo(
-    matrix : np.array,
-    ax_name : matplotlib.axis,
+    matrix,
+    ax_name,
     ylabel : str,
     colors_base : int = False,
     highlight_position : int = False,
@@ -1650,7 +1648,7 @@ def plot_logo(
 
 
 def find_hits_and_make_logo(
-    matrix: np.array,
+    matrix,
     ax_name,
     known_PFM,
     cutoff=0.8,
@@ -1658,8 +1656,8 @@ def find_hits_and_make_logo(
     best_motif_in_range=10,
     known_ICM=False,
     min_relative_attribution=0.15,
-    multiple_one_hot: np.array = False,
-    hits: pd.DataFrame = None,
+    multiple_one_hot = False,
+    hits = None,
     fig=None,
     split_pos_neg=False,
 ):
@@ -1684,7 +1682,6 @@ def find_hits_and_make_logo(
     import numpy as np
     import pandas as pd
     from matplotlib import pyplot as plt, colors
-    from PARM.motif_scanning.motif_scanning import run_motif_scanning
     import logomaker
     
     len_seq = matrix.shape[1]

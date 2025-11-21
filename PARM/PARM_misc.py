@@ -29,6 +29,7 @@ def check_sequence_length(fasta_file, L_max = 600):
     If any, an error message is printed.
     """
     import sys
+    from Bio import SeqIO
     for record in SeqIO.parse(fasta_file, "fasta"):
         if len(record.seq) > L_max:
             sys.exit(f"Error: Sequence {record.id} is longer than {L_max} nucleotides.")
