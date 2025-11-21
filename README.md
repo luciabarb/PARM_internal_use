@@ -7,9 +7,9 @@
   - [Predicting promoter activity](#predicting-promoter-activity)
 - [Running _in-silico_ mutagenesis](#running-in-silico-mutagenesis)
 - [Plotting results of _in-silico_ mutagenesis](#plotting-results-of-in-silico-mutagenesis)
-  - [Training your own PARM model](#training-your-own-parm-model)
+- [Training your own PARM model](#training-your-own-parm-model)
   - [Evaluating your model with the test fold](#evaluating-your-model-with-the-test-fold)
-  - [Considerations for training your model](#considerations-for-training-your-model)
+    - [Considerations for training your model](#considerations-for-training-your-model)
 - [Citation](#citation)
 
 ## Introduction
@@ -58,12 +58,11 @@ The following column contains the predicted promoter activity for the model you 
 
 For the command line above, you should expect the following result:
 
-| sequence    | header                           | prediction_K562   |
-|-------------|----------------------------------|-------------------|
-| CTGGGAGG... | CXCR4_chr2:136875708:136875939:- | 2.287095785140991 |
-| GCAACTAA... | MED16_chr19:893131:893362:-      | 2.22406268119812  |
-| ACGCCCAG... | TERT_chr5:1295135:1295366:-      | 1.993780255317688 |
-
+| sequence    | header                           | prediction_K562 |
+|-------------|----------------------------------|-----------------|
+| CTGGGAGG... | CXCR4_chr2:136875708:136875939:- | 5.92669         |
+| GCAACTAA... | MED16_chr19:893131:893362:-      | 7.1692824       |
+| ACGCCCAG... | TERT_chr5:1295135:1295366:-      | 6.3693314       |
 
 ## Running _in-silico_ mutagenesis
 
