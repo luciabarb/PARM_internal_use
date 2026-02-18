@@ -286,10 +286,10 @@ def train_subparser(subparsers):
 
     model_args.add_argument(
         "--betas",
-        default=(0.0005, 0.0005),
+        default=(0.001, 0.001),
         nargs="+",
         type=float,
-        help="L1 and L2 regularization terms respectively. (default: (0.005, 0.005) ) \t run like -betas 0.1 0.2 \n",
+        help="L1 and L2 regularization terms respectively. (default: (0.001, 0.001) ) \t run like -betas 0.1 0.2 \n",
     )
 
     model_args.add_argument(
@@ -310,10 +310,10 @@ def train_subparser(subparsers):
 
     model_args.add_argument(
         "--weight_decay",
-        default=0.0,
+        default=0.2,
         nargs="?",
         type=float,
-        help="Weight decay (default: 0.0) \n",
+        help="Weight decay (default: 0.2) \n",
     )
 
     model_args.add_argument(
@@ -353,6 +353,13 @@ def train_subparser(subparsers):
         default=None,
         type=str,
         help="Path to initial weights file. If None, random initialization is used. (default: None)",
+    )
+
+    model_args.add_argument(
+        "--filtering_on_FEAT",
+        default=False,
+        type=str,
+        help="Filtering the h5 file based on where the fragments overlap. Only choose this option if the files have been set up for filtering in either TSS or EnhA."
     )
 
     other_args = group.add_argument_group("Other")
