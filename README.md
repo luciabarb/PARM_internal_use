@@ -217,4 +217,4 @@ This will create `my_AGS_model_test` directory containing the scatter plots show
 
 If you make use of PARM and/or this pipeline, please cite:
 
-> [Barbadilla-Martínez, L.; Klaassen, N.; Franceschini-Santos, V. H.; Breda, J.; Hernandez-Quiles, M.; van Lieshout, T.; Urzua Traslaviña, C.; Yücel, H.; Boi, M.; Hermana-Garcia-Agullo, C.; Gregoricchio, S.; Zwart, W.; Voest, E.; Franke, L.; Vermeulen, M.; de Ridder, J., van Steensel, B. (2024). The regulatory grammar of human promoters uncovered by MPRA-trained deep learning. BioRxiv.](https://www.biorxiv.org/content/10.1101/2024.07.09.602649v2)
+> [Barbadilla-Martínez, L., Klaassen, N., Franceschini-Santos, V.H. et al. Regulatory grammar in human promoters uncovered by MPRA-based deep learning. Nature (2026).](https://doi.org/10.1038/s41586-025-10093-z)
