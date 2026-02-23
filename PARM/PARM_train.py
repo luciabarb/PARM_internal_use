@@ -30,6 +30,7 @@ def PARM_train(args):
     L_max = args.L_max
     scheduler = args.cosine_scheduler
     weight_decay = args.weight_decay
+    filtering_on_FEAT = args.filtering_on_FEAT
     validation_path = args.validation
     if type(validation_path) != list:
         validation_path = list(validation_path)
@@ -88,6 +89,7 @@ def PARM_train(args):
         "cell_type": args.cell_type,
         "n_workers": args.n_workers,
         "initial_weights": initial_weights,
+        "filtering_on_FEAT" : filtering_on_FEAT
     }
 
     objective(**param_model)
@@ -110,6 +112,7 @@ def objective(
     adaptor=(False, False),
     n_workers=0,
     initial_weights=None,
+    filtering_on_FEAT=False
 ):
     """
     Objetive function to train and validate models.
@@ -148,7 +151,7 @@ def objective(
     ###############################################
     ###Load model
 
-    # cell_type_strip_replicates = celltype.replace('pNK7_','').replace('_B','')
+
     if initial_weights is None:
         log("Initializing model with random weights")
         model = load_PARM(
@@ -210,6 +213,11 @@ def objective(
 
         index_train_ind = np.arange(len(training_set))
 
+        if filtering_on_FEAT:
+            index_train_ind = index_of_interest(data_length = len(training_set), 
+                                                            file_path = directory, 
+                                                            features = filtering_on_FEAT)
+
         index_dataset_train = np.append(
             index_dataset_train,
             np.array([index_train_ind, np.repeat(i, len(index_train_ind))]),
@@ -229,10 +237,9 @@ def objective(
 
     #### VALIDATION
 
-    ##feat_selection_percentage
     index_dataset_valid = np.empty((2, 0), dtype=int)
     for i, directory in enumerate(validation_path):
-        validation_set = h5_dataset(path=validation_path, celltype=cell_type)
+        validation_set = h5_dataset(path=directory, celltype=cell_type)
 
         index_valid_ind = np.arange(len(validation_set))
 
@@ -304,7 +311,9 @@ def objective(
 
         # If Nan, there's something going on in the training. We stop the training.
         if math.isnan(training_loss):
-            raise optuna.exceptions.TrialPruned()
+            raise ValueError(
+                f"Training loss is NaN in epoch {epoch}. Something is going wrong in the training. Check your data and your model."
+            )
 
         ########### VALIDATION LOOP
         log("  Start validation")
@@ -398,18 +407,11 @@ def train_loop(
     """
 
     model.train()
-    loss_value = 9.9999
     training_loss = 0.0
     y_train_predicted, y_train_true = np.empty((0, 1)), np.empty((0, 1))
     pbar = tqdm(enumerate(train_dataloader), ncols=100, total=total_iterations, file=sys.stdout)
+    
     for batch_ndx, (X, y) in pbar:
-        pbar.set_postfix(
-            {
-                "Epoch": this_epoch,
-                "Loss": f"{loss_value:.4f}",
-                "LR": f"{optimizer.param_groups[0]['lr']:.4f}",
-            }
-        )
 
         optimizer.zero_grad()
 
@@ -430,12 +432,8 @@ def train_loop(
 
         if betas[0] != 0 or betas[1] != 0:
 
-            l2_norm = sum(
-                torch.norm(weight, p=2) for _, weight in model.named_parameters()
-            )
-            l1_norm = sum(
-                torch.norm(weight, p=1) for _, weight in model.named_parameters()
-            )
+            l2_norm = sum(torch.norm(weight, p=2) for name, weight in model.named_parameters())
+            l1_norm = sum(torch.norm(weight, p=2) for name, weight in model.named_parameters())
 
             loss = criterion(pred, y) + l2_norm * betas[1] + l1_norm * betas[0]
 
@@ -456,6 +454,14 @@ def train_loop(
             scheduler.step()
 
         loss_value = training_loss / (batch_ndx + 1)
+
+        pbar.set_postfix(
+            {
+                "Epoch": this_epoch,
+                "Loss": f"{loss_value:.4f}",
+                "LR": f"{optimizer.param_groups[0]['lr']:.4f}",
+            }
+        )
 
     training_loss /= batch_ndx
 
@@ -522,13 +528,9 @@ def validation_loop(
 
             if betas[0] != 0 or betas[1] != 0:
 
-                l2_norm = sum(
-                    torch.norm(weight, p=2) for _, weight in model.named_parameters()
-                )
+                l2_norm = sum(torch.norm(weight, p=2) for name, weight in model.named_parameters())
+                l1_norm = sum(torch.norm(weight, p=2) for name, weight in model.named_parameters())
 
-                l1_norm = sum(
-                    torch.norm(weight, p=2) for _, weight in model.named_parameters()
-                )
 
                 loss = criterion(pred, y) + l2_norm * betas[1] + l1_norm * betas[0]
 
