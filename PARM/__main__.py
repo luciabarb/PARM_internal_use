@@ -662,9 +662,9 @@ def bye_message():
     return (
         "\nAll done!\n"
         "If you make use of PARM in your research, please cite:\n\n"
-        "  Barbadilla-Martínez L., Klaassen N.H., Franceschini-Santos V.H, et. al. (2024) \n"
-        "  The regulatory grammar of human promoters uncovered by MPRA-trained deep learning. \n"
-        "  bioRXiv. https://doi.org/10.1101/2024.07.09.602649\n"
+        "  Barbadilla-Martínez L., Klaassen N.H., Franceschini-Santos V.H, et. al. \n"
+        "  Regulatory grammar in human promoters uncovered by MPRA-based deep learning.\n"
+        "  Nature (2026). https://doi.org/10.1038/s41586-025-10093-z\n"
         "\n"
         ""
     )
