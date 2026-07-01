@@ -13,7 +13,9 @@ def load_PARM(
     type_loss: str = 'poisson',
     cell_line: str = False,
     maxglobalpool: bool = True,
-    use_AttentionPool: bool = True
+    use_AttentionPool: bool = True,
+    dense_layer_after_split: bool = False,
+    dense_layer_size: int = 64
 ):
     """
     Function to load the PARM model given a weight file.
@@ -55,7 +57,9 @@ def load_PARM(
                                 validation=(not train),
                                 index_interested_output=False, 
                                 maxglobalpool=maxglobalpool,
-                                use_AttentionPool=use_AttentionPool)
+                                use_AttentionPool=use_AttentionPool,
+                                dense_layer_after_split=dense_layer_after_split,
+                                dense_layer_size=dense_layer_size)
     
     if train:
         if torch.cuda.is_available():
@@ -208,6 +212,7 @@ class ResNet_Attentionpool(nn.Module):
             self.relu = nn.ReLU()
         else:
             self.cell_heads = nn.ModuleList([DenseLayersAfterSplit(filter_size, self.dense_layer_size, self.heteroscedastic) for _ in range(output_nodes)])  # a dense layer per cell line
+            self.relu = nn.ReLU()
         #################
 
     def forward(self, x):
