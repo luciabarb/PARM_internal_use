@@ -665,7 +665,8 @@ def PARM_eval_model(model_dir,
                     normalization_method="Log2RPM",
                     filter_size=125,
                     n_conv_blocks=5,
-                    dense_layer_after_spliit=False
+                    dense_layer_after_spliit=False,
+                    dense_layer_size=64
                     ):
     """
     """
@@ -703,7 +704,8 @@ def PARM_eval_model(model_dir,
                 filter_size=filter_size,
                 n_block = n_conv_blocks,
                 cell_line=cell_type,
-                dense_layer_after_split=dense_layer_after_spliit
+                dense_layer_after_split=dense_layer_after_spliit,
+                dense_layer_size=dense_layer_size
             ))
 
     print(

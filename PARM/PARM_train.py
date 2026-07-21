@@ -33,6 +33,7 @@ def PARM_train(args):
     filtering_on_FEAT = args.filtering_on_FEAT
     validation_path = args.validation
     dense_layer_after_split = args.dense_layer_after_split
+    dense_layer_size = args.dense_layer_size
     if type(validation_path) != list:
         validation_path = list(validation_path)
 
@@ -91,7 +92,8 @@ def PARM_train(args):
         "n_workers": args.n_workers,
         "initial_weights": initial_weights,
         "filtering_on_FEAT" : filtering_on_FEAT,
-        "dense_layer_after_split": dense_layer_after_split
+        "dense_layer_after_split": dense_layer_after_split,
+        "dense_layer_size": dense_layer_size
     }
 
     objective(**param_model)
@@ -115,7 +117,8 @@ def objective(
     n_workers=0,
     initial_weights=None,
     filtering_on_FEAT=False,
-    dense_layer_after_split=False
+    dense_layer_after_split=False,
+    dense_layer_size=64
 ):
     """
     Objetive function to train and validate models.
@@ -172,7 +175,8 @@ def objective(
             filter_size=filter_size,
             train=True,
             cell_line=cell_type,
-            dense_layer_after_split=dense_layer_after_split
+            dense_layer_after_split=dense_layer_after_split,
+            dense_layer_size=dense_layer_size
         )
     else:
         log(f"Initializing model using weights in {initial_weights}")
@@ -182,7 +186,8 @@ def objective(
             n_block=n_block,
             filter_size=filter_size,
             cell_line=cell_type,
-            dense_layer_after_split=dense_layer_after_split
+            dense_layer_after_split=dense_layer_after_split,
+            dense_layer_size=dense_layer_size
         )
     dummybatch = torch.zeros(1, 4, L_max)
 
@@ -442,9 +447,9 @@ def train_loop(
 
     y_train_predicted, y_train_true = np.empty((0, n_cell_lines)), np.empty((0, n_cell_lines))
 
-    pbar = tqdm(enumerate(train_dataloader), ncols=100, total=total_iterations, file=sys.stdout)
+    pbar = tqdm(ncols=100, total=total_iterations, file=sys.stdout)
     
-    for batch_ndx, (X, y) in pbar:
+    for batch_ndx, (X, y) in enumerate(train_dataloader):
 
         optimizer.zero_grad()
 
@@ -492,13 +497,15 @@ def train_loop(
         
         loss_value = training_loss / (batch_ndx + 1)
 
-        pbar.set_postfix(
-            {
-                "Epoch": this_epoch,
-                "Loss": f"{loss_value:.4f}",
-                "LR": f"{optimizer.param_groups[0]['lr']:.4f}",
-            }
-        )
+        if batch_ndx % 1000 == 0:
+            pbar.update(1000)
+            pbar.set_postfix(
+                {
+                    "Epoch": this_epoch,
+                    "Loss": f"{loss_value:.4f}",
+                    "LR": f"{optimizer.param_groups[0]['lr']:.4f}",
+                }
+            )
 
 
     training_loss /= batch_ndx

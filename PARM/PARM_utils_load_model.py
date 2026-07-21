@@ -15,7 +15,7 @@ def load_PARM(
     maxglobalpool: bool = True,
     use_AttentionPool: bool = True,
     dense_layer_after_split: bool = False,
-    dense_layer_size: int = 64
+    dense_layer_size: int = 32
 ):
     """
     Function to load the PARM model given a weight file.
@@ -129,20 +129,20 @@ class AttentionPool(nn.Module):
 
 class DenseLayersAfterSplit(nn.Module):
     
-    def __init__(self, filter_size, output_nodes, heteroscedastic=False):
+    def __init__(self, filter_size, size, heteroscedastic=False):
         super().__init__()
 
         if heteroscedastic is False:
             self.net = nn.Sequential(
-                nn.Linear(filter_size, output_nodes),
+                nn.Linear(filter_size, size),
                 nn.ReLU(),
-                nn.Linear(output_nodes, 1)
+                nn.Linear(size, 1)
             )
         else:
             self.net = nn.Sequential(
-                nn.Linear(filter_size, output_nodes),
+                nn.Linear(filter_size, size),
                 nn.ReLU(),
-                nn.Linear(output_nodes, 2)
+                nn.Linear(size, 2)
             )
 
     def forward(self, x):
@@ -154,7 +154,7 @@ class ResNet_Attentionpool(nn.Module):
                 type_loss='poisson', validation=False, index_interested_output=False, maxglobalpool=True,
                 vocab=4, use_AttentionPool=True,
                 dense_layer_after_split=False,
-                dense_layer_size=64):
+                dense_layer_size=32):
         super(ResNet_Attentionpool, self).__init__()
 
         self.type_loss = type_loss

@@ -111,6 +111,7 @@ def train(args):
     print_arguments("Filter size", args.filter_size)
     print_arguments("Initial weights", args.initial_weights)
     print_arguments("Dense layer after split", args.dense_layer_after_split)
+    print_arguments("Dense layer size", args.dense_layer_size)
 
     print("=" * 80)
     PARM_train(args)
@@ -245,6 +246,8 @@ def evaluation_model(args):
     print_arguments("Filter size of the model", args.filter_size)
     print_arguments("Number of convolution blocks of the model", args.n_blocks)
     print_arguments("File of SNPs in SuRE format to compute the SNP effects", args.file_SNP_SuRE)
+    print_arguments("Dense layer after split", args.dense_layer_after_split)
+    print_arguments("Dense layer size", args.dense_layer_size)
     # Same but now filling the output with spaces so it gets 80 characters
     print("=" * 80)
     PARM_eval_model(
@@ -262,7 +265,9 @@ def evaluation_model(args):
         normalization_method=args.normalization_method,
         filter_size=args.filter_size,
         n_conv_blocks=args.n_blocks,
-        file_SNP_SuRE=args.file_SNP_SuRE
+        file_SNP_SuRE=args.file_SNP_SuRE,
+        dense_layer_after_spliit=args.dense_layer_after_split,
+        dense_layer_size=args.dense_layer_size
     )
 
 def str2bool(v):
@@ -425,6 +430,13 @@ def train_subparser(subparsers):
         help="Number of dense layers after split. (default: False)",
         default=False,
         type=str2bool,
+    )
+    
+    model_args.add_argument(
+        "--dense_layer_size",
+        type=int,
+        default=64,
+        help="General argument. \n Size of the dense layer after split (default: 64) \n",
     )
 
     other_args = group.add_argument_group("Other")
@@ -807,6 +819,13 @@ def evaluation_model_subparser(subparsers):
         type=str2bool,
         default=False,
         help="General argument. \n Whether to use dense layers after split (default: False) \n",
+    )
+    
+    optional_arguments.add_argument(
+        "--dense_layer_size",
+        type=int,
+        default=32,
+        help="General argument. \n Size of the dense layer after split (default: 32) \n",
     )
 
     # Arguments for the input files

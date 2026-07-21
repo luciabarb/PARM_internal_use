@@ -21,8 +21,12 @@ def PARM_mutagenesis(
     input: str,
     model_directory: str,
     motif_database: str,
+    cell_type: str,
     output_directory: str,
     filter_size: int = 125,
+    type_loss: str = "poisson",
+    n_conv_blocks: int = 5,
+
 ):
     """
     Function to execute the in-silico mutageesis of a sequence using the PARM models.
@@ -82,7 +86,13 @@ def PARM_mutagenesis(
                 f"Model prefixes do not match: {model_name} and {os.path.basename(model_weight).split('_fold')[0]}. Please make sure that folds of the same model have the same prefix"
             )
         complete_models.append(
-            load_PARM(model_weight, filter_size=filter_size, train=False)
+            load_PARM(model_weight,
+                type_loss = type_loss,
+                filter_size=filter_size,
+                n_block = n_conv_blocks,
+                cell_line=cell_type,
+                train=False,
+        )
         )
 
     # ====================================================================================
