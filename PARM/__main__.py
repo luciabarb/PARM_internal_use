@@ -167,7 +167,7 @@ def mutagenesis(args):
     print_arguments("Number of convolution blocks", args.n_blocks)
     # check if args.motif_database is the default
     if args.motif_database == default_motif_db:
-        print_arguments("Motif database", "HOCOMOCOv11 (default)")
+        print_arguments("Motif database", "HOCOMOCOv14 (default)")
     else:
         print_arguments("Motif database", args.motif_database)
     # Same but now filling the output with spaces so it gets 80 characters
@@ -209,7 +209,7 @@ def plot(args):
     print_arguments("Attribution range", r)
     print_arguments("Plot format", args.plot_format)
     if args.motif_database == default_motif_db:
-        print_arguments("Motif database", "HOCOMOCOv11 (default)")
+        print_arguments("Motif database", "HOCOMOCOv14 (default)")
     else:
         print_arguments("Motif database", args.motif_database)
     # Same but now filling the output with spaces so it gets 80 characters
@@ -604,8 +604,8 @@ def mutagenesis_subparser(subparsers):
     optional_arguments = group.add_argument_group("Optional arguments")
     optional_arguments.add_argument(
         "--motif_database",
-        default="https://hocomoco11.autosome.org/final_bundle/hocomoco11/core/HUMAN/mono/HOCOMOCOv11_core_HUMAN_mono_jaspar_format.txt",
-        help="Path or url to the motif databae (JASPAR format). Default is HOCOMOCOv11: https://hocomoco11.autosome.org/final_bundle/hocomoco11/core/HUMAN/mono/HOCOMOCOv11_core_HUMAN_mono_jaspar_format.txt",
+        default="https://hocomoco14.autosome.org/final_bundle/hocomoco14/H14INVIVO/formatted_motifs/H14INVIVO_jaspar_format.txt",
+        help="Path or url to the motif databae (JASPAR format). Default is HOCOMOCOv14: https://hocomoco14.autosome.org/final_bundle/hocomoco14/H14INVIVO/formatted_motifs/H14INVIVO_jaspar_format.txt",
     )
 
     advanced_args = group.add_argument_group("Advanced arguments (if you trained your own model)")
@@ -713,8 +713,8 @@ def plot_subparser(subparsers):
     )
     optional_arguments.add_argument(
         "--motif_database",
-        default="https://hocomoco11.autosome.org/final_bundle/hocomoco11/core/HUMAN/mono/HOCOMOCOv11_core_HUMAN_mono_jaspar_format.txt",
-        help="Path or url to the motif database (JASPAR format). Default is HOCOMOCOv11: https://hocomoco11.autosome.org/final_bundle/hocomoco11/core/HUMAN/mono/HOCOMOCOv11_core_HUMAN_mono_jaspar_format.txt",
+        default="https://hocomoco14.autosome.org/final_bundle/hocomoco14/H14INVIVO/formatted_motifs/H14INVIVO_jaspar_format.txt",
+        help="Path or url to the motif database (JASPAR format). Default is HOCOMOCOv14: https://hocomoco14.autosome.org/final_bundle/hocomoco14/H14INVIVO/formatted_motifs/H14INVIVO_jaspar_format.txt",
     )
     optional_arguments.add_argument(
         "--attribution_range",
@@ -765,7 +765,7 @@ def evaluation_model_subparser(subparsers):
         "        (if --file_input_mutagenesis_validation is provided, it can be found in the repo: ./example_data/mutagenesis_library/mutagenesis_validation_promoters.txt). \n"
         "3) Check whether motifs are detected by the model. \n"
         " In a set of random sequences, we insert each motif from the database individually, compute the ISM, and measure the correlation between the attribution scores and the known motif. \n"
-        " (set in --PWM_datasets HOCOMOCOv11 is used by default.) \n"
+        " (set in --PWM_datasets HOCOMOCOv14 is used by default.) \n"
         "4) Compute the predicted effect of SNPs with significant effect in the SuRE4n data (as tested in van Arensbergen et al., 2019) (if --file_SNP_SuRE is provided, it can be found in the repo: ./example_data/SNP_SuRE/SuRE_SNPs_example.txt). \n",
         formatter_class=MyHelpFormatter,
         add_help=False,
@@ -891,7 +891,7 @@ def evaluation_model_subparser(subparsers):
         nargs="+",
         default = False,
         help="Step 3) \n Files or paths of the PWM datasets in jaspar format to use to study motifs in the model. If several, separate them by a space. \n"
-        "e.g. https://hocomoco11.autosome.org/final_bundle/hocomoco11/core/HUMAN/mono/HOCOMOCOv11_core_HUMAN_mono_jaspar_format.txt. (default: False, if not provided, motif analysis will not be performed. If you want to use the HOCOMOCOv11 database, you can set it as https://hocomoco11.autosome.org/final_bundle/hocomoco11/core/HUMAN/mono/HOCOMOCOv11_core_HUMAN_mono_jaspar_format.txt \n",
+        "e.g. https://hocomoco14.autosome.org/final_bundle/hocomoco14/H14INVIVO/formatted_motifs/H14INVIVO_jaspar_format.txt. (default: False, if not provided, motif analysis will not be performed. If you want to use the HOCOMOCOv14 database, you can set it as https://hocomoco14.autosome.org/final_bundle/hocomoco14/H14INVIVO/formatted_motifs/H14INVIVO_jaspar_format.txt \n",
     )
 
     optional_arguments.add_argument(

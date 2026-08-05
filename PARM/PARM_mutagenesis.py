@@ -129,7 +129,7 @@ def PARM_mutagenesis(
 
 
 def dict_jaspar(
-    file: str = "https://hocomoco11.autosome.org/final_bundle/hocomoco11/core/HUMAN/mono/HOCOMOCOv11_core_HUMAN_mono_jaspar_format.txt",
+    file: str = "https://hocomoco14.autosome.org/final_bundle/hocomoco14/H14INVIVO/formatted_motifs/H14INVIVO_jaspar_format.txt",
     reverse: bool = False,
 ):
     """
@@ -161,9 +161,11 @@ def dict_jaspar(
     import io
     import urllib.request
 
+    is_hoco = False
     if "https" in file:
         handle = urllib.request.urlopen(file)
         hocomoco_jaspar = io.TextIOWrapper(handle, encoding="utf-8")
+        is_hoco = True
 
     else:
         hocomoco_jaspar = open(file)
@@ -176,22 +178,31 @@ def dict_jaspar(
 
     # Loop through all motifs
     for m in motifs.parse(hocomoco_jaspar, "jaspar"):
+        if is_hoco:
+            # Keep only primary motifs with quality A, B, or C
+            tf, _, rank, _, qual = m.name.split(".")
+            if rank != "0" and qual not in ["A", "B", "C"]:
+                continue
+            else:
+                tf_name = tf
+        else:
+            tf_name = m.name
         PWM = np.array([m.pwm[i] for i in m.pwm.keys()])
-        PWM_hocomoco_dict[m.name] = PWM
+        PWM_hocomoco_dict[tf_name] = PWM
 
         pssm = np.array([m.pssm[i] for i in m.pssm.keys()])
         pssm[np.isinf(pssm)] = pssm[~np.isinf(pssm)].min()
-        PSSM_hocomoco_dict[m.name] = pssm
+        PSSM_hocomoco_dict[tf_name] = pssm
         counts = m.counts
 
         PFM = np.array([counts[i] for i in counts.keys()])
         PFM = PFM / PFM.sum(axis=0)
-        PFM_hocomoco_dict[m.name] = PFM
-        consensus_hocomoco_dict[m.name] = str(m.consensus)
+        PFM_hocomoco_dict[tf_name] = PFM
+        consensus_hocomoco_dict[tf_name] = str(m.consensus)
 
         ICTtotal = np.log2(4)
         ICT = ICTtotal - np.sum((-PFM * np.log2(PFM + 0.00001)), axis=0)
-        ICT_hocomoco_dict[m.name] = PFM * ICT
+        ICT_hocomoco_dict[tf_name] = PFM * ICT
 
     # Compute reverse of all motifs
     if reverse:
@@ -1502,7 +1513,7 @@ def PARM_plot_mutagenesis(
     output_directory = None,
     attribution_range: list = None,
     min_relative_attribution: float = 0.15,
-    motif_database: str = "https://hocomoco11.autosome.org/final_bundle/hocomoco11/core/HUMAN/mono/HOCOMOCOv11_core_HUMAN_mono_jaspar_format.txt",
+    motif_database: str = "https://hocomoco14.autosome.org/final_bundle/hocomoco14/H14INVIVO/formatted_motifs/H14INVIVO_jaspar_format.txt",
 ):
     """
     Generate the plots of the mutagenesis data (produced by PARM_mutagenesis.py).
@@ -1588,7 +1599,8 @@ def PARM_plot_mutagenesis(
             hits=hits_data,
             output_file=output_file,
             attribution_range=attribution_range,
-            min_relative_attribution=min_relative_attribution
+            min_relative_attribution=min_relative_attribution,
+            motif_database=motif_database,
         )
         pbar.update(1)
 
@@ -1866,8 +1878,6 @@ def find_hits_and_make_logo(
         for selected_hit in hits_to_plot:
 
             motif_name = selected_hit['name_motif'].split("_")[0]
-            if "-" in selected_hit['name_motif']:
-                motif_name = f"{motif_name} -"
 
             rho = np.abs(round(selected_hit['rho'], 2))
             text_motif = f"{motif_name} R = {rho}"
@@ -2080,7 +2090,7 @@ def plot_mutagenesis(
     mutagenesis_df,
     seq,
     TSS_position=0,
-    motif_database="https://hocomoco11.autosome.org/final_bundle/hocomoco11/core/HUMAN/mono/HOCOMOCOv11_core_HUMAN_mono_jaspar_format.txt",
+    motif_database="https://hocomoco14.autosome.org/final_bundle/hocomoco14/H14INVIVO/formatted_motifs/H14INVIVO_jaspar_format.txt",
     output_file=False,
     promoter_name="",
     return_fig=False,
