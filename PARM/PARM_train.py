@@ -636,19 +636,18 @@ def validation_loop(
                 y_val_real = np.append(y_val_real, y.cpu().detach().numpy(), axis=0)
 
             if betas[0] != 0 or betas[1] != 0:
+                if '__' in cell_type:
+                    l1_norm, l2_norm = masked_reg_terms(model, index_info_cell, model.dense_layer_after_split)
 
-            if '__' in cell_type:
-                l1_norm, l2_norm = masked_reg_terms(model, index_info_cell, model.dense_layer_after_split)
+                else:
+
+                    l2_norm = sum(torch.norm(weight, p=2) for name, weight in model.named_parameters())
+                    l1_norm = sum(torch.norm(weight, p=2) for name, weight in model.named_parameters())
+
+                loss = criterion(pred, y, mask=index_info_cell) + l2_norm * betas[1] + l1_norm * betas[0]
 
             else:
-
-                l2_norm = sum(torch.norm(weight, p=2) for name, weight in model.named_parameters())
-                l1_norm = sum(torch.norm(weight, p=2) for name, weight in model.named_parameters())
-
-            loss = criterion(pred, y, mask=index_info_cell) + l2_norm * betas[1] + l1_norm * betas[0]
-
-        else:
-            loss = criterion(pred, y, mask=index_info_cell)
+                loss = criterion(pred, y, mask=index_info_cell)
 
 
             # Backpropagation

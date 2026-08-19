@@ -178,15 +178,16 @@ def dict_jaspar(
 
     # Loop through all motifs
     for m in motifs.parse(hocomoco_jaspar, "jaspar"):
-        if is_hoco:
-            # Keep only primary motifs with quality A, B, or C
-            tf, _, rank, _, qual = m.name.split(".")
-            if rank != "0" and qual not in ["A", "B", "C"]:
-                continue
-            else:
-                tf_name = tf
-        else:
-            tf_name = m.name
+        # if is_hoco:
+        #     # Keep only primary motifs with quality A, B, or C
+        #     tf, _, rank, _, qual = m.name.split(".")
+        #     if rank != "0" and qual not in ["A", "B", "C"]:
+        #         continue
+        #     else:
+        #         tf_name = tf
+        # else:
+        #     tf_name = m.name
+        tf_name = m.name
         PWM = np.array([m.pwm[i] for i in m.pwm.keys()])
         PWM_hocomoco_dict[tf_name] = PWM
 
